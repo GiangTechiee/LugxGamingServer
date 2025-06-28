@@ -1,0 +1,279 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Model: Users
+model Users {
+  user_id       Int       @id @default(autoincrement())
+  username      String    @unique @db.VarChar(50)
+  email         String    @unique @db.VarChar(100)
+  password_hash String    @db.VarChar(255)
+  full_name     String?   @db.VarChar(100)
+  phone_number  String?   @db.VarChar(20)
+  role          UserRole  @default(CUSTOMER)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  is_active     Boolean   @default(true)
+
+  // Email verification fields
+  is_verified              Boolean   @default(false)
+  verification_token       String?   @db.VarChar(64)
+  verification_expires_at  DateTime?
+
+  // Password reset fields  
+  reset_token              String?   @db.VarChar(64)
+  reset_expires_at         DateTime?
+
+  orders        Orders[]  @relation("UserOrders")
+  cart          Cart?     @relation("UserCart")
+  reviews       Reviews[] @relation("UserReviews")
+  wishlist      Wishlist[] @relation("UserWishlist")
+  refreshTokens RefreshTokens[] @relation("UserRefreshTokens")
+  @@index([user_id])
+  @@index([verification_token])
+  @@index([reset_token])
+}
+
+//
+model RefreshTokens {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  token        String   @unique
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+  user         Users    @relation("UserRefreshTokens", fields: [user_id], references: [user_id], onDelete: Cascade)
+  @@index([user_id])
+}
+
+// Model: Games
+model Games {
+  game_id        Int           @id @default(autoincrement())
+  title          String        @db.VarChar(255)
+  description    String?       @db.Text
+  price          Decimal       @db.Decimal(12, 2)
+  discount_price Decimal?      @db.Decimal(12, 2)
+  developer      String?       @db.VarChar(100)
+  publisher      String?       @db.VarChar(100)
+  release_date   DateTime?     @db.Date
+  is_hot         Boolean       @default(false)
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  game_genres    Game_Genres[] @relation("GameToGenres")
+  game_platforms Game_Platforms[] @relation("GameToPlatforms")
+  order_items    Order_Items[] @relation("GameOrderItems")
+  cart_items     Cart_Items[]  @relation("GameCartItems")
+  reviews        Reviews[]     @relation("GameReviews")
+  wishlist       Wishlist[]    @relation("GameWishlist")
+  game_images    Game_Images[] @relation("GameImages")
+  @@index([game_id])
+  @@index([title]) 
+  @@index([price])
+  @@index([is_hot])    
+  @@index([updated_at])
+}
+
+// Model: Genres
+model Genres {
+  genre_id    Int           @id @default(autoincrement())
+  name        String        @unique @db.VarChar(50)
+  description String?       @db.Text
+  game_genres Game_Genres[] @relation("GenreToGames")
+  @@index([genre_id])
+}
+
+// Model: Game_Genres
+model Game_Genres {
+  game_id  Int
+  genre_id Int
+  game     Games  @relation("GameToGenres", fields: [game_id], references: [game_id])
+  genre    Genres @relation("GenreToGames", fields: [genre_id], references: [genre_id])
+  @@id([game_id, genre_id])
+  @@index([game_id])
+  @@index([genre_id])
+}
+
+// Model: Platforms
+model Platforms {
+  platform_id    Int              @id @default(autoincrement())
+  name           String           @unique @db.VarChar(50)
+  description    String?          @db.Text
+  game_platforms Game_Platforms[] @relation("PlatformToGames")
+  @@index([platform_id])
+}
+
+// Model: Orders
+model Orders {
+  order_id       Int           @id @default(autoincrement())
+  user_id        Int
+  total_amount   Decimal       @db.Decimal(12, 2)
+  discounted_amount Decimal?   @db.Decimal(12, 2)
+  status         OrderStatus   @default(PENDING)
+  notes          String?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  user           Users         @relation("UserOrders", fields: [user_id], references: [user_id], onDelete: Cascade)
+  order_items    Order_Items[] @relation("OrderToItems")
+  payments       Payments[]    @relation("OrderPayments")
+  @@index([order_id])
+  @@index([user_id])
+  @@index([status]) 
+  @@index([created_at])
+}
+
+// Model: Order_Items
+model Order_Items {
+  order_item_id    Int      @id @default(autoincrement())
+  order_id         Int
+  game_id          Int
+  order            Orders   @relation("OrderToItems", fields: [order_id], references: [order_id], onDelete: Cascade)
+  game             Games    @relation("GameOrderItems", fields: [game_id], references: [game_id], onDelete: Restrict)
+  @@index([order_id])
+  @@index([game_id])
+}
+
+// Model: Cart
+model Cart {
+  cart_id    Int          @id @default(autoincrement())
+  user_id    Int          @unique
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  user       Users        @relation("UserCart", fields: [user_id], references: [user_id], onDelete: Cascade)
+  cart_items Cart_Items[] @relation("CartToItems")
+  @@index([cart_id])
+  @@index([user_id])
+}
+
+// Model: Cart_Items
+model Cart_Items {
+  cart_item_id Int   @id @default(autoincrement())
+  cart_id      Int
+  game_id      Int
+  cart         Cart  @relation("CartToItems", fields: [cart_id], references: [cart_id], onDelete: Cascade)
+  game         Games @relation("GameCartItems", fields: [game_id], references: [game_id], onDelete: Cascade)
+  @@index([cart_id])
+  @@index([game_id])
+  @@unique([cart_id, game_id])
+}
+
+// Model: Reviews
+model Reviews {
+  review_id  Int      @id @default(autoincrement())
+  user_id    Int
+  game_id    Int
+  rating     Int      @db.SmallInt
+  comment    String?  @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       Users    @relation("UserReviews", fields: [user_id], references: [user_id], onDelete: SetNull)
+  game       Games    @relation("GameReviews", fields: [game_id], references: [game_id], onDelete: Cascade)
+  @@index([user_id])
+  @@index([game_id])
+  @@index([rating])
+  @@unique([user_id, game_id])
+}
+
+// Model: Promotions
+model Promotions {
+  promotion_id   Int      @id @default(autoincrement())
+  code           String   @unique @db.VarChar(50)
+  description    String?  @db.Text
+  discount_type  DiscountType
+  discount_value Decimal  @db.Decimal(12, 2)
+  minimum_order  Decimal?     @db.Decimal(12, 0)
+  start_date     DateTime?
+  end_date       DateTime?
+  is_active      Boolean  @default(true)
+}
+
+// Model: Game_Platforms
+model Game_Platforms {
+  game_id     Int
+  platform_id Int
+  game        Games     @relation("GameToPlatforms", fields: [game_id], references: [game_id], onDelete: Cascade)
+  platform    Platforms @relation("PlatformToGames", fields: [platform_id], references: [platform_id], onDelete: Cascade)
+  @@id([game_id, platform_id])
+  @@index([game_id])
+  @@index([platform_id])
+}
+
+// Model: Payments
+model Payments {
+  payment_id     Int      @id @default(autoincrement())
+  order_id       Int
+  payment_method PaymentMethod 
+  amount         Decimal  @db.Decimal(12, 2)
+  transaction_id String?  @db.VarChar(100)
+  status         PaymentStatus @default(PENDING)
+  payment_date   DateTime? //thời gian thanh toán thành công
+  failure_reason String?
+  created_at     DateTime @default(now())
+  order          Orders   @relation("OrderPayments", fields: [order_id], references: [order_id], onDelete: Cascade)
+  @@index([order_id])
+}
+
+// Model: Wishlist
+model Wishlist {
+  wishlist_id Int      @id @default(autoincrement())
+  user_id     Int
+  game_id     Int
+  added_at    DateTime @default(now())
+  user        Users    @relation("UserWishlist", fields: [user_id], references: [user_id], onDelete: Cascade)
+  game        Games    @relation("GameWishlist", fields: [game_id], references: [game_id], onDelete: Cascade)
+  @@index([user_id])
+  @@index([game_id])
+  @@unique([user_id, game_id])
+}
+
+// Model: Game_Images
+model Game_Images {
+  image_id   Int       @id @default(autoincrement())
+  game_id    Int
+  image_url  String    @db.VarChar(255)
+  alt_text   String?   @db.VarChar(255) 
+  order_index Int?
+  created_at DateTime  @default(now())
+  game       Games     @relation("GameImages", fields: [game_id], references: [game_id], onDelete: Cascade)
+  @@index([game_id])
+}
+
+// Enum
+enum UserRole {
+  CUSTOMER
+  ADMIN
+  MODERATOR
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+  MOMO
+  ZALOPAY
+  VNPAY
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
