@@ -2,7 +2,7 @@
 CREATE TYPE "UserRole" AS ENUM ('CUSTOMER', 'ADMIN', 'MODERATOR');
 
 -- CreateEnum
-CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED');
+CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PROCESSING', 'DELIVERED', 'CANCELLED', 'REFUNDED');
 
 -- CreateEnum
 CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'COMPLETED', 'FAILED', 'CANCELLED', 'REFUNDED');
@@ -25,8 +25,24 @@ CREATE TABLE "Users" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "is_verified" BOOLEAN NOT NULL DEFAULT false,
+    "verification_token" VARCHAR(64),
+    "verification_expires_at" TIMESTAMP(3),
+    "reset_token" VARCHAR(64),
+    "reset_expires_at" TIMESTAMP(3),
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("user_id")
+);
+
+-- CreateTable
+CREATE TABLE "RefreshTokens" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "token" TEXT NOT NULL,
+    "expires_at" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "RefreshTokens_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -39,6 +55,7 @@ CREATE TABLE "Games" (
     "developer" VARCHAR(100),
     "publisher" VARCHAR(100),
     "release_date" DATE,
+    "is_hot" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -76,8 +93,8 @@ CREATE TABLE "Orders" (
     "order_id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
     "total_amount" DECIMAL(12,2) NOT NULL,
+    "discounted_amount" DECIMAL(12,2),
     "status" "OrderStatus" NOT NULL DEFAULT 'PENDING',
-    "payment_method" VARCHAR(50),
     "notes" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -90,8 +107,6 @@ CREATE TABLE "Order_Items" (
     "order_item_id" SERIAL NOT NULL,
     "order_id" INTEGER NOT NULL,
     "game_id" INTEGER NOT NULL,
-    "unit_price" DECIMAL(12,2) NOT NULL,
-    "discount_applied" DECIMAL(12,2) DEFAULT 0.00,
 
     CONSTRAINT "Order_Items_pkey" PRIMARY KEY ("order_item_id")
 );
@@ -198,6 +213,18 @@ CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
 CREATE INDEX "Users_user_id_idx" ON "Users"("user_id");
 
 -- CreateIndex
+CREATE INDEX "Users_verification_token_idx" ON "Users"("verification_token");
+
+-- CreateIndex
+CREATE INDEX "Users_reset_token_idx" ON "Users"("reset_token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "RefreshTokens_token_key" ON "RefreshTokens"("token");
+
+-- CreateIndex
+CREATE INDEX "RefreshTokens_user_id_idx" ON "RefreshTokens"("user_id");
+
+-- CreateIndex
 CREATE INDEX "Games_game_id_idx" ON "Games"("game_id");
 
 -- CreateIndex
@@ -205,6 +232,12 @@ CREATE INDEX "Games_title_idx" ON "Games"("title");
 
 -- CreateIndex
 CREATE INDEX "Games_price_idx" ON "Games"("price");
+
+-- CreateIndex
+CREATE INDEX "Games_is_hot_idx" ON "Games"("is_hot");
+
+-- CreateIndex
+CREATE INDEX "Games_updated_at_idx" ON "Games"("updated_at");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Genres_name_key" ON "Genres"("name");
@@ -295,6 +328,9 @@ CREATE UNIQUE INDEX "Wishlist_user_id_game_id_key" ON "Wishlist"("user_id", "gam
 
 -- CreateIndex
 CREATE INDEX "Game_Images_game_id_idx" ON "Game_Images"("game_id");
+
+-- AddForeignKey
+ALTER TABLE "RefreshTokens" ADD CONSTRAINT "RefreshTokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Game_Genres" ADD CONSTRAINT "Game_Genres_game_id_fkey" FOREIGN KEY ("game_id") REFERENCES "Games"("game_id") ON DELETE RESTRICT ON UPDATE CASCADE;
