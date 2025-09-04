@@ -1,98 +1,225 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Game Store Website System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A comprehensive e-commerce platform for gaming products, built with modern web technologies and secure payment integration.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🎮 Demo
 
-## Description
+**Live Demo**: [https://lugx-gaming-client.vercel.app](https://lugx-gaming-client.vercel.app)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 📋 Table of Contents
 
-## Project setup
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Documentation](#api-documentation)
+- [Project Structure](#project-structure)
+- [Screenshots](#screenshots)
+- [Contributing](#contributing)
+- [License](#license)
 
+## 📖 Overview
+
+LUGX Gaming is a full-stack e-commerce platform designed specifically for gaming enthusiasts. The platform provides a seamless shopping experience with secure authentication, product management, and optimized performance for handling gaming product catalogs.
+
+## ✨ Features
+
+- 🛒 **Product Catalog** - Browse and search gaming products
+- 🔐 **User Authentication** - Secure login and registration system
+- 🛍️ **Shopping Cart** - Add, remove, and manage cart items
+- 💳 **Order Management** - Track orders and purchase history
+- 👤 **User Profiles** - Manage personal information and preferences
+- 📱 **Responsive Design** - Optimized for desktop and mobile devices
+- ⚡ **Performance Optimized** - Fast loading with efficient data management
+- 🔍 **Advanced Search** - Filter products by category, price, and ratings
+- 📊 **Admin Panel** - Product and user management for administrators
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Node.js** - JavaScript runtime environment
+- **NestJS** - Progressive Node.js framework for scalable applications
+- **PostgreSQL** - Robust relational database management system
+- **JWT** - JSON Web Tokens for secure authentication
+- **bcrypt** - Password hashing for security
+
+### Frontend
+- **Next.js** - React framework with SSR capabilities
+- **React** - Component-based UI library
+- **Tailwind CSS** - Utility-first CSS framework
+- **Axios** - HTTP client for API requests
+
+## 🔧 Installation
+
+### Prerequisites
+- Node.js (v16 or higher)
+- PostgreSQL (v12 or higher)
+- npm or yarn package manager
+
+### Backend Setup
 ```bash
-$ npm install
+# Clone the repository
+git clone https://github.com/GiangTechiee/LugxGamingServer.git
+cd LugxGamingServer
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Configure your database connection and JWT secret
+
+# Database setup
+npm run migration:run
+npm run seed:run
+
+# Start development server
+npm run start:dev
 ```
 
-## Compile and run the project
-
+### Frontend Setup
 ```bash
-# development
-$ npm run start
+# Clone frontend repository
+git clone [https://github.com/GiangTechiee/GameStoreClient.git]
+cd lugx-gaming-client
 
-# watch mode
-$ npm run start:dev
+# Install dependencies
+npm install
 
-# production mode
-$ npm run start:prod
+# Configure environment variables
+cp .env.local.example .env.local
+# Set API base URL and other configurations
+
+# Start development server
+npm run dev
 ```
 
-## Run tests
+## 🎯 Usage
 
-```bash
-# unit tests
-$ npm run test
+### For Customers
+1. **Browse Products**: Explore gaming products by categories
+2. **User Account**: Register or login to access full features
+3. **Shopping**: Add products to cart and proceed to checkout
+4. **Order Tracking**: Monitor order status and history
 
-# e2e tests
-$ npm run test:e2e
+### For Administrators
+1. **Product Management**: Add, edit, or remove products
+2. **User Management**: View and manage user accounts
+3. **Order Management**: Process and track customer orders
+4. **Analytics**: View sales reports and platform statistics
 
-# test coverage
-$ npm run test:cov
+## 📚 API Documentation
+
+### Authentication
+```
+POST /auth/register     - User registration
+POST /auth/login        - User login
+POST /auth/logout       - User logout
+GET  /auth/profile      - Get user profile
+PUT  /auth/profile      - Update user profile
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+### Products
+```
+GET    /products        - Get all products
+GET    /products/:id    - Get product by ID
+POST   /products        - Create new product (Admin)
+PUT    /products/:id    - Update product (Admin)
+DELETE /products/:id    - Delete product (Admin)
+GET    /products/search - Search products
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Orders
+```
+GET    /orders          - Get user orders
+POST   /orders          - Create new order
+GET    /orders/:id      - Get order details
+PUT    /orders/:id      - Update order status
+```
 
-## Resources
+### Categories
+```
+GET    /categories      - Get all categories
+POST   /categories      - Create category (Admin)
+PUT    /categories/:id  - Update category (Admin)
+DELETE /categories/:id  - Delete category (Admin)
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+## 📁 Project Structure
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```
+lugx-gaming-server/
+├── src/
+│   ├── auth/           # Authentication module
+│   ├── products/       # Product management
+│   ├── orders/         # Order processing
+│   ├── users/          # User management
+│   ├── categories/     # Product categories
+│   ├── common/         # Shared utilities
+│   ├── database/       # Database configuration
+│   └── main.ts         # Application entry point
+├── migrations/         # Database migrations
+├── seeds/              # Database seeders
+├── test/               # Test files
+├── uploads/            # File uploads
+└── README.md
+```
 
-## Support
+## 📸 Screenshots
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Homepage
+![Homepage](screenshots/homepage.png)
 
-## Stay in touch
+### Product Catalog
+![Products](screenshots/products.png)
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Shopping Cart
+![Cart](screenshots/cart.png)
 
-## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Manual Deployment
+```bash
+# Build production
+npm run build
+
+# Start production server
+npm run start:prod
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### Development Guidelines
+- Follow TypeScript best practices
+- Write unit tests for new features
+- Update documentation for API changes
+- Use conventional commit messages
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👤 Author
+
+**Trần Trường Giang**
+- Email: giangtt8726@gmail.com
+- GitHub: [@GiangTechiee](https://github.com/GiangTechiee)
+- LinkedIn: [Trần Trường Giang](https://linkedin.com/in/tran-truong-giang)
+
+## 🙏 Acknowledgments
+
+- Thanks to the NestJS team for the amazing framework
+- Tailwind CSS for the utility-first approach
+- PostgreSQL for reliable data management
+
+---
+
+⭐ If you found this project helpful, please give it a star!
